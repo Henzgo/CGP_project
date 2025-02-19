@@ -67,8 +67,8 @@ GLuint createShaderProgram() {
 	GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
 	GLuint fShader = glCreateShader(GL_FRAGMENT_SHADER);
 
-	string vertShaderStr = readShaderSource("shaders/vertShader.glsl");
-	string fragShaderStr = readShaderSource("shaders/fragShader.glsl");
+	string vertShaderStr = readShaderSource("shaders/vertShaderEx2_2.glsl");
+	string fragShaderStr = readShaderSource("shaders/fragShaderEx2_2.glsl");
 
 	const char* vertShaderSrc = vertShaderStr.c_str();
 	const char* fragShaderSrc = fragShaderStr.c_str();
@@ -97,7 +97,6 @@ GLuint createShaderProgram() {
 	GLuint vfProgram = glCreateProgram();
 
 	// catch errors while linking shaders
-
 	glAttachShader(vfProgram, vShader);
 	glAttachShader(vfProgram, fShader);
 
@@ -108,6 +107,16 @@ GLuint createShaderProgram() {
 		cout << "linking failed" << endl;
 		printProgramLog(vfProgram);
 	}
+
+	// Validate the program
+	glValidateProgram(vfProgram);
+	GLint validated;
+	glGetProgramiv(vfProgram, GL_VALIDATE_STATUS, &validated);
+	if (validated != GL_TRUE) {
+		cout << "Program validation failed" << endl;
+		printProgramLog(vfProgram);
+	}
+
 	return vfProgram;
 }
 
@@ -117,22 +126,14 @@ void init(GLFWwindow* window) {
 	glBindVertexArray(vao[0]);
 }
 
-float x = 0.0f;
-float inc = 0.01f;
-
 void display(GLFWwindow* window, double currentTime) {
+
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT); // clear the bakcground to black, each time
+	//glClear(GL_COLOR_BUFFER_BIT);
 
 	glUseProgram(renderingProgram);
-
-	x += inc; // move the triangle along x axis
-	if (x > 1.0f) inc = -0.01f; // switch to moving the triangle to the left
-	if (x < -1.0f) inc = 0.01f; // switch to moving the triangle to the right
-	GLuint offsetLoc = glGetUniformLocation(renderingProgram, "offset"); // get ptr to "offset"
-	glProgramUniform1f(renderingProgram, offsetLoc, x); // send value in "x" to "offset"
-
+	//checkOpenGlError();
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
@@ -140,7 +141,7 @@ int main(void) {
 	if (!glfwInit()) { exit(EXIT_FAILURE); }
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	GLFWwindow* window = glfwCreateWindow(600, 600, "Chapter2 - programm1", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(600, 600, "Chapter2 - Exercise 2.2", NULL, NULL);
 	glfwMakeContextCurrent(window);
 	if (glewInit() != GLEW_OK) { exit(EXIT_FAILURE); }
 	glfwSwapInterval(1);

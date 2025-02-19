@@ -10,6 +10,10 @@ using namespace std;
 GLuint renderingProgram;
 GLuint vao[numVAOs];
 
+float x = 0.0f;
+float speed = 1.0f; // Bewegungsgeschwindigkeit
+float direction = 1.0f; // 1 = rechts, -1 = links
+
 void printShaderLog(GLuint shader) {
 	int len = 0;
 	int chWrittn = 0;
@@ -117,19 +121,20 @@ void init(GLFWwindow* window) {
 	glBindVertexArray(vao[0]);
 }
 
-float x = 0.0f;
-float inc = 0.01f;
-
-void display(GLFWwindow* window, double currentTime) {
+void display(GLFWwindow* window, double deltaTime) {
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT); // clear the bakcground to black, each time
 
 	glUseProgram(renderingProgram);
 
-	x += inc; // move the triangle along x axis
-	if (x > 1.0f) inc = -0.01f; // switch to moving the triangle to the left
-	if (x < -1.0f) inc = 0.01f; // switch to moving the triangle to the right
+	// Bewegung des Dreiecks basierend auf der vergangenen Zeit
+	x += direction * 0.0167 * speed; // move the triangle along x axis
+
+	// Grenzen prüfen und Richtung ändern
+	if (x > 1.0f) direction = -1.0f; // switch to moving the triangle to the left
+	if (x < -1.0f) direction = 1.0f; // switch to moving the triangle to the right
+
 	GLuint offsetLoc = glGetUniformLocation(renderingProgram, "offset"); // get ptr to "offset"
 	glProgramUniform1f(renderingProgram, offsetLoc, x); // send value in "x" to "offset"
 
@@ -140,15 +145,21 @@ int main(void) {
 	if (!glfwInit()) { exit(EXIT_FAILURE); }
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	GLFWwindow* window = glfwCreateWindow(600, 600, "Chapter2 - programm1", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(600, 600, "Chapter2 - Exercise 2.4", NULL, NULL);
 	glfwMakeContextCurrent(window);
 	if (glewInit() != GLEW_OK) { exit(EXIT_FAILURE); }
 	glfwSwapInterval(1);
 
 	init(window);
 
+	double lastTime = glfwGetTime();
+
 	while (!glfwWindowShouldClose(window)) {
-		display(window, glfwGetTime());
+		double currentTime = glfwGetTime();
+		double deltaTime = currentTime - lastTime;
+		lastTime = currentTime;
+
+		display(window, deltaTime);
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
