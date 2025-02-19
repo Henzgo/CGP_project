@@ -129,7 +129,7 @@ void display(GLFWwindow* window, double deltaTime) {
 	glUseProgram(renderingProgram);
 
 	// Bewegung des Dreiecks basierend auf der vergangenen Zeit
-	x += direction * 0.0167 * speed; // move the triangle along x axis
+	x += direction * speed * deltaTime; // move the triangle along x axis
 
 	// Grenzen prüfen und Richtung ändern
 	if (x > 1.0f) direction = -1.0f; // switch to moving the triangle to the left
