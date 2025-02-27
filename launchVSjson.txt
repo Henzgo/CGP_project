@@ -1,0 +1,62 @@
+{
+  "version": "0.2.1",
+  "defaults": {},
+  "configurations": [
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "main.exe (src\\main.exe)",
+      "name": "main.exe (src\\main.exe)",
+      "currentDir": "${workspaceRoot}/src"
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "main_ex_2_1.exe (src\\main_ex_2_1.exe)",
+      "name": "main_ex_2_1.exe (src\\main_ex_2_1.exe)",
+      "currentDir": "${workspaceRoot}/src"
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "main_ex_2_2.exe (src\\main_ex_2_2.exe)",
+      "name": "main_ex_2_2.exe (src\\main_ex_2_2.exe)",
+      "currentDir": "${workspaceRoot}/src"
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "main_ex_2_3.exe (src\\main_ex_2_3.exe)",
+      "name": "main_ex_2_3.exe (src\\main_ex_2_3.exe)",
+      "currentDir": "${workspaceRoot}/src"
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "main_ex_2_4.exe (src\\main_ex_2_4.exe)",
+      "name": "main_ex_2_4.exe (src\\main_ex_2_4.exe)",
+      "currentDir": "${workspaceRoot}/src"
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "main_prog_3_1.exe (src\\main_prog_3_1.exe)",
+      "name": "main_prog_3_1.exe (src\\main_prog_3_1.exe)",
+      "currentDir": "${workspaceRoot}/src"
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "main_ex_3_1.exe (src\\main_ex_3_1.exe)",
+      "name": "main_ex_3_1.exe (src\\main_ex_3_1.exe)",
+      "currentDir": "${workspaceRoot}/src"
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "main_ex_3_3.exe (src\\main_ex_3_3.exe)",
+      "name": "main_ex_3_3.exe (src\\main_ex_3_3.exe)",
+      "currentDir": "${workspaceRoot}/src"
+    }
+  ]
+}

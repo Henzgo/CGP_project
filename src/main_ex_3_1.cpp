@@ -1,14 +1,35 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <glm/glm.hpp>
 #include <string>
 #include <fstream>
 #define numVAOs 1
 
 using namespace std;
+using namespace glm;
 
 GLuint renderingProgram;
 GLuint vao[numVAOs];
+
+// builds and returns a matrix that performs a rotation around the X axis
+mat4 buildRotateX(float rad)
+{
+	mat4 xrot = mat4(1.0, 0.0, 0.0, 0.0,
+		0.0, cos(rad), -sin(rad), 0.0,
+		0.0, sin(rad), cos(rad), 0.0,
+		0.0, 0.0, 0.0, 1.0);
+	return xrot;
+}
+
+// builds and returns a matrix that performs a rotation around the Y axis
+mat4 buildRotateY(float rad) {
+	mat4 yrot = mat4(cos(rad), 0.0, sin(rad), 0.0,
+		0.0, 1.0, 0.0, 0.0,
+		-sin(rad), 0.0, cos(rad), 0.0,
+		0.0, 0.0, 0.0, 1.0);
+	return yrot;
+}
 
 void printShaderLog(GLuint shader) {
 	int len = 0;
@@ -67,7 +88,7 @@ GLuint createShaderProgram() {
 	GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
 	GLuint fShader = glCreateShader(GL_FRAGMENT_SHADER);
 
-	string vertShaderStr = readShaderSource("shaders/vertShaderEx2_2.glsl");
+	string vertShaderStr = readShaderSource("shaders/vertShaderEx3_1.glsl");
 	string fragShaderStr = readShaderSource("shaders/fragShaderEx2_2.glsl");
 
 	const char* vertShaderSrc = vertShaderStr.c_str();
@@ -127,11 +148,21 @@ void init(GLFWwindow* window) {
 }
 
 void display(GLFWwindow* window, double currentTime) {
-
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 
 	glUseProgram(renderingProgram);
+
+	// Rotation um die X-Achse um 45 Grad
+	float angleX = radians(50.0f);
+	float angleY = radians(40.0f);
+	mat4 rotationMatrix = buildRotateY(angleY) * buildRotateX(angleX);
+
+	// Hole die Speicheradresse der uniform-Variable im Shader
+	GLuint rotationLoc = glGetUniformLocation(renderingProgram, "rotationMatrix");
+
+	// Schicke die Matrix an den Shader
+	glUniformMatrix4fv(rotationLoc, 1, GL_FALSE, &rotationMatrix[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 }
@@ -140,7 +171,7 @@ int main(void) {
 	if (!glfwInit()) { exit(EXIT_FAILURE); }
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	GLFWwindow* window = glfwCreateWindow(600, 600, "Chapter2 - Exercise 2.2", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(600, 600, "Chapter3 - Exercise 3.1", NULL, NULL);
 	glfwMakeContextCurrent(window);
 	if (glewInit() != GLEW_OK) { exit(EXIT_FAILURE); }
 	glfwSwapInterval(1);
