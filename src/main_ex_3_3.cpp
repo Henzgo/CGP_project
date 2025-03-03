@@ -133,7 +133,12 @@ void display(GLFWwindow* window, double currentTime) {
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 
 	glUseProgram(renderingProgram);
-	mat4 rotationMatrix = rotate(45.0f, 
+
+	float angleX = radians(45.0f);
+	float angleY = radians(45.0f);
+	float angleZ = radians(45.0f);
+
+	mat4 rotationMatrix = rotate(mat4(1.0f), angleX, )
 
 	// Hole die Speicheradresse der uniform-Variable im Shader
 	GLuint rotationLoc = glGetUniformLocation(renderingProgram, "rotationMatrix");
