@@ -5,6 +5,7 @@
 #include <string>
 #include <fstream>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
 #define numVAOs 1
 
 using namespace std;
@@ -139,15 +140,31 @@ void display(GLFWwindow* window, double currentTime) {
 	float angleY = radians(45.0f);
 	float angleZ = radians(45.0f);
 
+	// Rotationsmatrix mit Euler-Winkeln
 	mat4 rotationMatrix = rotate(mat4(1.0f), angleX, vec3(1.0f, 0.0f, 0.0f)) *
 		rotate(mat4(1.0f), angleY, vec3(0.0f, 1.0f, 0.0f)) *
 		rotate(mat4(1.0f), angleZ, vec3(0.0f, 0.0f, 1.0f));
 
+	// Rotationsmatrix mit Quaternions
+	quat qX = angleAxis(angleX, vec3(1.0f, 0.0f, 0.0f));
+	quat qY = angleAxis(angleY, vec3(0.0f, 1.0f, 0.0f));
+	quat qZ = angleAxis(angleZ, vec3(0.0f, 0.0f, 1.0f));
+
+	// Reihenfolge beachten
+	quat qRotation = qZ * qY * qX;
+
+	// Konvertieren das Quaternion in eine 4x4-Matrix für OpenGL
+	mat4 quatRotationMatrix = mat4_cast(qRotation);
+
 	// Hole die Speicheradresse der uniform-Variable im Shader
 	GLuint rotationLoc = glGetUniformLocation(renderingProgram, "rotationMatrix");
 
+	GLuint quatRotationLoc = glGetUniformLocation(renderingProgram, "quatRotationMatrix");
+
 	// Schicke die Matrix an den Shader
 	glUniformMatrix4fv(rotationLoc, 1, GL_FALSE, &rotationMatrix[0][0]);
+
+	glUniformMatrix4fv(quatRotationLoc, 1, GL_FALSE, &quatRotationMatrix[0][0]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 }
