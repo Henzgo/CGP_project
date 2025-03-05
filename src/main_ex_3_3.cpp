@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <string>
 #include <fstream>
+#include <glm/gtc/matrix_transform.hpp>
 #define numVAOs 1
 
 using namespace std;
@@ -138,7 +139,9 @@ void display(GLFWwindow* window, double currentTime) {
 	float angleY = radians(45.0f);
 	float angleZ = radians(45.0f);
 
-	mat4 rotationMatrix = rotate(mat4(1.0f), angleX, )
+	mat4 rotationMatrix = rotate(mat4(1.0f), angleX, vec3(1.0f, 0.0f, 0.0f)) *
+		rotate(mat4(1.0f), angleY, vec3(0.0f, 1.0f, 0.0f)) *
+		rotate(mat4(1.0f), angleZ, vec3(0.0f, 0.0f, 1.0f));
 
 	// Hole die Speicheradresse der uniform-Variable im Shader
 	GLuint rotationLoc = glGetUniformLocation(renderingProgram, "rotationMatrix");
