@@ -57,6 +57,13 @@
       "projectTarget": "main_ex_3_3.exe (src\\main_ex_3_3.exe)",
       "name": "main_ex_3_3.exe (src\\main_ex_3_3.exe)",
       "currentDir": "${workspaceRoot}/src"
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "main_prog_4_1.exe (src\\main_prog_4_1.exe)",
+      "name": "main_prog_4_1.exe (src\\main_prog_4_1.exe)",
+      "currentDir": "${workspaceRoot}/src"
     }
   ]
 }
