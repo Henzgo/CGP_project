@@ -15,7 +15,7 @@ using namespace std;
 #define numVBOs 2
 
 float cameraX, cameraY, cameraZ;
-float cubeLocX, cubeLocY, cubeLocZ;
+//float cubeLocX, cubeLocY, cubeLocZ;
 GLuint renderinProgram;
 GLuint vao[numVAOs];
 GLuint vbo[numVBOs];
@@ -24,7 +24,7 @@ GLuint vbo[numVBOs];
 GLuint mvLoc, projLoc;
 int width, height;
 float aspect;
-glm::mat4 pMat, vMat, mMat, mvMat;
+glm::mat4 pMat, vMat, mMat, mvMat, tMat, rMat;
 
 void setupVertices(void) {
     // 36 vertices, 12 triangles, makes 2x2x2 cube placed at origin
@@ -53,27 +53,39 @@ void setupVertices(void) {
 
 void init(GLFWwindow * window) {
     renderinProgram = Utils::createShaderProgram("shaders/vertShaderProg4_1.glsl", "shaders/fragShaderProg4_1.glsl");
-    cameraX = 0.0f; cameraY = 0.0f; cameraZ = 8.0f;
-    cubeLocX = 0.0f; cubeLocY = -2.0f; cubeLocZ = 0.0f; // shift down Y to reveal perspective
-    setupVertices();
-}
-
-void display(GLFWwindow* window, double currentTime) {
-    glClear(GL_DEPTH_BUFFER_BIT);
-    glUseProgram(renderinProgram);
-
-    // get the uniform variables for the MV and projection matrices
-    mvLoc = glGetUniformLocation(renderinProgram, "mv_matrix");
-    projLoc = glGetUniformLocation(renderinProgram, "proj_matrix");
 
     //build perspective matrix
     glfwGetFramebufferSize(window, &width, &height);
     aspect = (float)width / (float)height;
     pMat = glm::perspective(1.0472f, aspect, 0.1f, 1000.0f); // 1.0472 radians = 60 degrees
 
-    // build view matrix, model matrix, and model-view matrix
+    cameraX = 0.0f; cameraY = 0.0f; cameraZ = 8.0f;
+    setupVertices();
+}
+
+void display(GLFWwindow* window, double currentTime) {
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glUseProgram(renderinProgram);
+
+    // get the uniform variables for the MV and projection matrices
+    mvLoc = glGetUniformLocation(renderinProgram, "mv_matrix");
+    projLoc = glGetUniformLocation(renderinProgram, "proj_matrix");
+
     vMat = glm::translate(glm::mat4(1.0f), glm::vec3(-cameraX, -cameraY, -cameraZ));
-    mMat = glm::translate(glm::mat4(1.0f), glm::vec3(cubeLocX, cubeLocY, cubeLocZ));
+
+    tMat = glm::translate(glm::mat4(1.0f),
+        glm::vec3(sin(0.35f * currentTime) * 2.0f, cos(0.52f * currentTime) * 2.0f, sin(0.7f * currentTime) * 2.0f));
+
+    // use current time to compute different translations in x, y, and z
+    rMat = glm::rotate(glm::mat4(1.0f), 1.75f * (float)currentTime, glm::vec3(0.0f, 1.0f, 0.0f));
+    rMat = glm::rotate(rMat, 1.75f * (float)currentTime, glm::vec3(1.0f, 0.0f, 0.0f));
+    rMat = glm::rotate(rMat, 1.75f * (float)currentTime, glm::vec3(0.0f, 0.0f, 1.0f));
+
+    mMat = tMat * rMat;
+    //mMat = rMat * tMat; Wrong order
+
     mvMat = vMat * mMat;
 
     // copy perspective and MV maatrices to corresponding uniform variables
@@ -91,6 +103,12 @@ void display(GLFWwindow* window, double currentTime) {
     glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
+void window_size_callback(GLFWwindow* win, int newWidth, int newHeight) {
+    aspect = (float)newWidth / (float)newHeight;
+    glViewport(0, 0, newWidth, newHeight);
+    pMat = glm::perspective(1.0472f, aspect, 0.1f, 1000.0f);
+}
+
 int main(void) {
     if (!glfwInit()) { exit(EXIT_FAILURE); }
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -100,16 +118,19 @@ int main(void) {
     if (glewInit() != GLEW_OK) { exit(EXIT_FAILURE); }
     glfwSwapInterval(1);
 
+    glfwSetWindowSizeCallback(window, window_size_callback);
+
     init(window);
 
     double lastTime = glfwGetTime();
 
     while (!glfwWindowShouldClose(window)) {
-        double currentTime = glfwGetTime();
-        double deltaTime = currentTime - lastTime;
-        lastTime = currentTime;
+        //double currentTime = glfwGetTime();
+        //double deltaTime = currentTime - lastTime;
+        //lastTime = currentTime;
 
-        display(window, deltaTime);
+        //display(window, deltaTime);
+        display(window, glfwGetTime());
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
