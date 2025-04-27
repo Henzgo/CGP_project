@@ -96,6 +96,7 @@ void display(GLFWwindow* window, double currentTime) {
     mvLoc = glGetUniformLocation(renderinProgram, "mv_matrix");
     projLoc = glGetUniformLocation(renderinProgram, "proj_matrix");
 
+    // push view matrix onto the stack
     vMat = glm::translate(glm::mat4(1.0f), glm::vec3(-cameraX, -cameraY, -cameraZ));
     mvStack.push(vMat);
 
@@ -123,7 +124,8 @@ void display(GLFWwindow* window, double currentTime) {
     mvStack.push(mvStack.top());
     mvStack.top() *= glm::rotate(glm::mat4(1.0f), (float)currentTime, glm::vec3(0.0, 1.0, 0.0)); // planet rotation
 
-    glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvStack.top()));
+    glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvStack.top())); // This call retrieves the values in the matrix on top of the stack, and
+    // those values are then sent to the uniform variable
     glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(0);
