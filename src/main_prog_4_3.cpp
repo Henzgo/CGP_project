@@ -93,6 +93,8 @@ void display(GLFWwindow* window, double currentTime) {
 
     vMat = glm::translate(glm::mat4(1.0f), glm::vec3(-cameraX, -cameraY, -cameraZ));
 
+    glEnable(GL_CULL_FACE);
+
     // drawing the cube (using buffer #0)
     mMat = glm::translate(glm::mat4(1.0f), glm::vec3(cubeLocX, cubeLocY, cubeLocZ));
     mvMat = vMat * mMat;
@@ -106,6 +108,7 @@ void display(GLFWwindow* window, double currentTime) {
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
+    glFrontFace(GL_CW); // the cube vertices have clockwise winding order
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
     // draw the pyramid (use buffer #1)
@@ -121,6 +124,7 @@ void display(GLFWwindow* window, double currentTime) {
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
+    glFrontFace(GL_CCW); // the pyramid vertices have counter-clockwise winding order
     glDrawArrays(GL_TRIANGLES, 0, 18);
 }
 
