@@ -87,11 +87,18 @@
       "currentDir": "${workspaceRoot}/src"
     },
     {
-        "type": "default",
-        "project": "CMakeLists.txt",
-        "projectTarget": "main_prog_4_4.exe (src\\main_prog_4_4.exe)",
-        "name": "main_prog_4_4.exe (src\\main_prog_4_4.exe)",
-        "currentDir": "${workspaceRoot}/src"
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "main_prog_4_4.exe (src\\main_prog_4_4.exe)",
+      "name": "main_prog_4_4.exe (src\\main_prog_4_4.exe)",
+      "currentDir": "${workspaceRoot}/src"
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "main_ex_4_1.exe (src\\main_ex_4_1.exe)",
+      "name": "main_ex_4_1.exe (src\\main_ex_4_1.exe)",
+      "currentDir": "${workspaceRoot}/src"
     }
   ]
 }
