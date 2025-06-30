@@ -99,6 +99,20 @@
       "projectTarget": "main_ex_4_1.exe (src\\main_ex_4_1.exe)",
       "name": "main_ex_4_1.exe (src\\main_ex_4_1.exe)",
       "currentDir": "${workspaceRoot}/src"
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "main_ex_4_2.exe (src\\main_ex_4_2.exe)",
+      "name": "main_ex_4_2.exe (src\\main_ex_4_2.exe)",
+      "currentDir": "${workspaceRoot}/src"
+    },
+    {
+        "type": "default",
+        "project": "CMakeLists.txt",
+        "projectTarget": "main_ex_4_2_quaternions.exe (src\\main_ex_4_2_quaternions.exe)",
+        "name": "main_ex_4_2_quaternions.exe (src\\main_ex_4_2_quaternions.exe)",
+        "currentDir": "${workspaceRoot}/src"
     }
   ]
 }
