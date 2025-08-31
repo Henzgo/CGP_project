@@ -10,6 +10,7 @@
 #include "Utils.hpp"
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/rotate_vector.hpp>
+#include <glm/gtc/constants.hpp> // für glm::half_pi
 
 using namespace std;
 
@@ -17,7 +18,6 @@ using namespace std;
 #define numVBOs 2
 
 glm::vec3 camPos(0.0f, 0.0f, 8.0f);
-//float cameraX, cameraY, cameraZ;
 glm::vec3 cameraU(1.0f, 0.0f, 0.0f);
 glm::vec3 cameraV(0.0f, 1.0f, 0.0f);
 glm::vec3 cameraN(0.0f, 0.0f, -1.0f);
@@ -32,6 +32,8 @@ bool isDragging = false;
 GLuint mvLoc, projLoc;
 int width, height;
 float aspect;
+float yaw = 0.0f; // Links/Rechts (um Welt-Y)
+float pitch = 0.0f; // Hoch/Runter (um Kamera-X)
 glm::mat4 pMat, vMat, mMat, mvMat, tMat, rMat, identity;
 std::vector<GLuint> indices;
 
@@ -239,6 +241,7 @@ void window_size_callback(GLFWwindow* win, int newWidth, int newHeight) {
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
     if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
         isDragging = true;
+        glfwGetCursorPos(window, &lastMouseX, &lastMouseY);
     }
     if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
         isDragging = false;
@@ -248,17 +251,21 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 void cursor_position_callback_quat(GLFWwindow* win, double xpos, double ypos) {
     if (!isDragging) { lastMouseX = xpos; lastMouseY = ypos; return; }
 
-    float deltaX = float(xpos - lastMouseX) * 0.005f; // yaw
-    float deltaY = -float(ypos - lastMouseY) * 0.005f; // pitch (Minus = natürliche Y-Achse)
+    const float sens = 0.005f;
+    
+    yaw += float(xpos - lastMouseX) * sens; // Yaw um Welt-Y
+    pitch += -float(ypos - lastMouseY) * sens; // Pitch um Kamera-X (Minus = natürliche Y-Achse)
 
-    // Inkrement-Rotation (Y-dann-X) erzeugen
-    glm::quat qYaw = glm::angleAxis(deltaX, glm::vec3(0, 1, 0));
-    glm::quat qPitch = glm::angleAxis(deltaY, glm::vec3(1, 0, 0));
+    // Pitch begrenzen, damit man nicht über den Kopf schauen kann
+    pitch = glm::clamp(pitch,
+        -glm::half_pi<float>() + 0.01f,
+        glm::half_pi<float>() - 0.01f);
 
-    // Kombinieren und auf bisherige Orientierung anwenden
-    gOrientation = glm::normalize(qPitch * qYaw * gOrientation);
+    // Roll = 0 -> kein seitliches Kippen
+    gOrientation = glm::quat(glm::vec3(pitch, yaw, 0.0f));
 
-    lastMouseX = xpos; lastMouseY = ypos;
+    lastMouseX = xpos;
+    lastMouseY = ypos;
 }
 
 int main(void) {
@@ -282,34 +289,51 @@ int main(void) {
 
     while (!glfwWindowShouldClose(window)) {
         double currentTime = glfwGetTime();
-        double deltaTime = currentTime - lastTime;
+        float dt = static_cast<float>(currentTime - lastTime);
         lastTime = currentTime;
-        display(window, glfwGetTime());
-        glfwSwapBuffers(window);
 
-        glm::vec3 forward = glm::mat3_cast(gOrientation) * glm::vec3(0, 0, -1);
-        glm::vec3 right = glm::mat3_cast(gOrientation) * glm::vec3(1, 0, 0);
-        glm::vec3 up = glm::mat3_cast(gOrientation) * glm::vec3(0, 1, 0);
+        // 1) Events zuerst
+        glfwPollEvents();
+
+        // 2) Richtungen aus aktueller Orientierung
+        glm::vec3 forward = gOrientation * glm::vec3(0, 0, -1);
+        glm::vec3 right = gOrientation * glm::vec3(1, 0, 0);
+        glm::vec3 upCam = gOrientation * glm::vec3(0, 1, 0);
+        glm::vec3 upWorld = glm::vec3(0, 1, 0);
+
+        // 3) dt begrenzen (verhindert Riesensprünge nach Pausen)
+        dt = glm::clamp(dt, 0.0f, 1.0f / 30.0f);
 
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-            camPos += forward * moveSpeed * deltaTime;
+            camPos += forward * moveSpeed * dt;
 
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-            camPos -= forward * moveSpeed * deltaTime;
+            camPos -= forward * moveSpeed * dt;
 
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-            camPos += right * moveSpeed * deltaTime;
+            camPos += right * moveSpeed * dt;
 
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-            camPos -= right * moveSpeed * deltaTime;
+            camPos -= right * moveSpeed * dt;
 
+        // Variante A: "Lift" wie No-Clip (Kamera-Up)
+        //if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        //    camPos += upCam * moveSpeed * dt;
+        //if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+        //    camPos -= upCam * moveSpeed * dt;
+
+        // Variante B: "Auf/Ab" entlang Welt-Y (typisch FPS)
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-            camPos += up * moveSpeed * deltaTime;
-
+            camPos += upWorld * moveSpeed * dt;
         if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-            camPos -= up * moveSpeed * deltaTime;
+            camPos -= upWorld * moveSpeed * dt;
 
-        glfwPollEvents();
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+            glfwSetWindowShouldClose(window, GLFW_TRUE);
+
+        // 5) Render mit derselben Zeit (keine zweite glfwGetTime()-Abfrage)
+        display(window, currentTime);
+        glfwSwapBuffers(window);
     }
 
     glfwDestroyWindow(window);
